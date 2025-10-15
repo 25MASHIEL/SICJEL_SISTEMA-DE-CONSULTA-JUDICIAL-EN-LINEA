@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SISTEMA DE CONSULTA JUDICIAL EN LÍNEA (SICJEL)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="container header-content">
+      <h1>SISTEMA DE CONSULTA JUDICIAL EN LÍNEA (SICJEL)</h1>
+      <nav>
+        <ul>
+          <li><a href="#" id="nav-inicio" class="nav-link current">Inicio / Búsqueda</a></li>
+          <li><a href="#" id="nav-todos" class="nav-link">Todos los Expedientes</a></li>
+          <li><a href="#" id="nav-contacto" class="nav-link">Ayuda y Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div class="breadcrumb">
+      <span id="breadcrumb-home" class="current">Inicio</span>
+      <span id="breadcrumb-results" style="display:none;"> > Resultados</span>
+      <span id="breadcrumb-detail" style="display:none;"> > Detalle de Expediente</span>
+    </div>
+
+    <section id="search-view" class="view">
+      <h2 class="centered-heading">Búsqueda de Expediente Judicial</h2>
+
+      <div class="welcome-card">
+        <i class="fas fa-gavel icon-large"></i>
+        <div>
+          <h3>Bienvenido(a) al SICJEL</h3>
+          <p>Utilice esta herramienta para consultar el estado, la información general y el historial procesal de sus expedientes judiciales a nivel nacional.</p>
+          <p>Ingrese los 7 componentes del número de expediente y el código de seguridad para iniciar su consulta.</p>
+        </div>
+      </div>
+
+      <div class="form-container elevated-form">
+        <form id="search-form">
+          <div class="form-row">
+            <label for="expedient-number">Número de Expediente:</label>
+            <div class="expedient-fields">
+              <input type="text" id="field1" maxlength="5" placeholder="00661" required>
+              <span>-</span>
+              <input type="text" id="field2" maxlength="4" placeholder="2025" required>
+              <span>-</span>
+              <input type="text" id="field3" maxlength="1" placeholder="0" required>
+              <span>-</span>
+              <input type="text" id="field4" maxlength="4" placeholder="2101" required>
+              <span>-</span>
+              <input type="text" id="field5" maxlength="2" placeholder="JR" required>
+              <span>-</span>
+              <input type="text" id="field6" maxlength="2" placeholder="CI" required>
+              <span>-</span>
+              <input type="text" id="field7" maxlength="2" placeholder="02" required>
+            </div>
+          </div>
+
+          <div class="form-row captcha-row centered-captcha">
+            <label for="captcha-input">Código de Seguridad: <i class="fas fa-lock"></i></label>
+            <div class="captcha-box modern-captcha">
+              <span id="captcha-code-display" class="captcha-code"></span>
+              <button type="button" id="refresh-captcha-button" class="refresh-button" title="Generar nuevo código"><i class="fas fa-redo"></i></button>
+              <input type="text" id="captcha-input" maxlength="5" placeholder="Escriba el código" required>
+            </div>
+          </div>
+
+          <div id="general-error" class="error-message" style="display:none;"></div>
+
+          <button type="submit" id="search-button" class="search-button">
+            <span class="spinner"></span>
+            <i class="fas fa-search"></i> Consultar Expediente
+          </button>
+        </form>
+
+        <p class="search-info">
+          <i class="fas fa-info-circle"></i> **SIMULACIÓN:** Para consultar el expediente de prueba, use el número completo:
+          <strong id="unique-expedient-id" class="expedient-example">00661-2025-0-2101-JR-CI-02</strong> (Rellene los campos pulsando **Tab** en el primer campo).
+        </p>
+
+      </div>
+    </section>
+
+    <section id="results-view" class="view" style="display:none;">
+      <h2>Resultados de Búsqueda</h2>
+      <p id="result-message" class="result-message"></p>
+
+      <table class="data-table results-table">
+        <thead>
+          <tr>
+            <th>N° Expediente</th>
+            <th>Instancia</th>
+            <th>Materia</th>
+            <th>Estado Actual</th>
+            <th>Último Acto</th>
+          </tr>
+        </thead>
+        <tbody id="results-body">
+        </tbody>
+      </table>
+
+      <button id="back-button" class="action-button back-button">Volver a la Búsqueda</button>
+    </section>
+
+    <section id="detail-view" class="view" style="display:none;">
+      <h2>Detalle del Expediente: <span id="id-number"></span></h2>
+
+      <div class="tab-container">
+        <button class="tab-button active" onclick="showTab('info')">Información General</button>
+        <button class="tab-button" onclick="showTab('parties')">Partes Procesales</button>
+        <button class="tab-button" onclick="showTab('history')">Historial Procesal</button>
+      </div>
+
+      <div id="tab-info" class="tab-content active">
+        <div class="info-grid">
+          <div class="info-item"><strong>Distrito Judicial:</strong> <span id="id-district"></span></div>
+          <div class="info-item"><strong>Juzgado / Sala:</strong> <span id="id-jurisdiction"></span></div>
+          <div class="info-item"><strong>Especialista:</strong> <span id="id-specialist"></span></div>
+          <div class="info-item"><strong>Juez:</strong> <span id="id-judge"></span></div>
+          <div class="info-item"><strong>Clase de Proceso:</strong> <span id="id-process"></span></div>
+          <div class="info-item"><strong>Fecha de Ingreso:</strong> <span id="id-date"></span></div>
+          <div class="info-item"><strong>Especialidad:</strong> <span id="id-specialty"></span></div>
+          <div class="info-item"><strong>Materia:</strong> <span id="id-materia"></span></div>
+          <div class="info-item full-width"><strong>Estado Actual:</strong> <span id="id-state" class="state-highlight"></span></div>
+        </div>
+        <div class="info-box">
+          <strong>Etapa:</strong> <span id="id-stage"></span> |
+          <strong>Ubicación Actual:</strong> <span id="id-location"></span>
+        </div>
+        <div class="info-box">
+          <strong>Resumen:</strong> <span id="id-summary"></span>
+        </div>
+        <div class="info-box">
+          <strong>Observación:</strong> <span id="id-observation"></span>
+        </div>
+        <div class="info-box">
+          <strong>Fecha de Conclusión:</strong> <span id="id-conclusion-date"></span>
+        </div>
+        <div class="info-box">
+          <strong>Motivo de Conclusión:</strong> <span id="id-conclusion-reason"></span>
+        </div>
+      </div>
+
+      <div id="tab-parties" class="tab-content">
+        <h3>Partes Involucradas</h3>
+        <table class="data-table parties-table">
+          <thead>
+            <tr>
+              <th>Rol</th>
+              <th>Tipo de Parte</th>
+              <th>Apellido Paterno / Razón Social</th>
+              <th>Apellido Materno</th>
+              <th>Nombre(s)</th>
+            </tr>
+          </thead>
+          <tbody id="parties-body">
+          </tbody>
+        </table>
+      </div>
+
+      <div id="tab-history" class="tab-content">
+        <h3>Historial de Actos y Documentos</h3>
+        <p class="history-note">
+          *Los documentos con "Acceso Restringido" son escritos privados de las partes y no pueden ser visualizados públicamente.
+        </p>
+        <table class="data-table history-table">
+          <thead>
+            <tr>
+              <th style="width: 5%;">N°</th>
+              <th style="width: 15%;">Fecha</th>
+              <th style="width: 25%;">Acto Procesal</th>
+              <th style="width: 35%;">Descripción / Observación</th>
+              <th style="width: 20%;">Documentos / Notificaciones</th>
+            </tr>
+          </thead>
+          <tbody id="history-body">
+          </tbody>
+        </table>
+      </div>
+
+      <button class="action-button back-button" onclick="showResults(document.getElementById('id-number').textContent, 'detail')">Volver a Resultados</button>
+    </section>
+
+    <section id="static-page-view" class="view" style="display:none;">
+      <h2 id="static-page-title"></h2>
+      <div id="static-page-content" class="static-content"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 Sistema de Consulta Judicial en Línea (SICJEL) - Poder Judicial del Perú</p>
+    </div>
+  </footer>
+
+  <div id="pdf-modal" class="modal">
+    <div class="modal-content large-modal">
+      <span class="close-button" id="close-pdf-modal">&times;</span>
+      <h3 id="modal-doc-name"></h3>
+      <div class="pdf-container">
+        <iframe id="pdf-viewer-iframe" src="" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <p class="modal-note">
+        *Nota: Este es un visor de solo lectura. Use el enlace de descarga si lo requiere.
+      </p>
+    </div>
+  </div>
+
+  <div id="notification-modal" class="modal">
+    <div class="modal-content small-modal">
+      <span class="close-button" id="close-notification-modal">&times;</span>
+      <h3 id="notification-modal-title">Detalle de Notificaciones</h3>
+      <div id="notification-modal-body" class="notification-list-container">
+      </div>
+      <p class="modal-note">*El detalle muestra todas las cédulas generadas para el acto.</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Función auxiliar para el manejo de pestañas
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+      });
+      document.getElementById('tab-' + tabName).classList.add('active');
+      document.querySelector(`.tab-button[onclick="showTab('${tabName}')"]`).classList.add('active');
+    }
+  </script>
+</body>
+
+</html>
